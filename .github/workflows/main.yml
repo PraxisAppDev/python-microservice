@@ -26,7 +26,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io/PraxisAppDev
+          registry: ghcr.io/env.OWNER_LC
           username: env.OWNER_LC
           password: ${{ secrets.GITHUB_TOKEN }}
   
@@ -34,7 +34,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ghcr.io/PraxisAppDev/get-client-ip
+          images: ghcr.io/env.OWNER_LC/get-client-ip
       
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -42,7 +42,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/PraxisAppDev/get-client-ip:latest
+          tags: ghcr.io/env.OWNER_LC/get-client-ip:latest
 
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
