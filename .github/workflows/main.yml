@@ -74,10 +74,10 @@ jobs:
       - name: Check if launch template exists
         id: check-lt
         run: |
-          LAUNCH_TEMPLATE_NAME="TemplateForAutoScaling"
+          LAUNCH_TEMPLATE_NAME="python-microservice-lt"
 
           #TODO: find graceful solution in the future
-          if aws ec2 describe-launch-templates --launch-template-names TemplateForAutoScaling > lt.json 2>&1; then
+          if aws ec2 describe-launch-templates --launch-template-names python-microservice-lt > lt.json 2>&1; then
             if [ $(jq '.LaunchTemplates | length' lt.json) -eq 0 ]; then
               echo "existslt=false" >> $GITHUB_ENV
             else
@@ -91,24 +91,32 @@ jobs:
         if: env.existslt == 'false'
         run: |
           aws ec2 create-launch-template \
-            --launch-template-name TemplateForAutoScaling \
-            --version-description AutoScalingVersion1 \
-            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vdWJhaGFzYmVlbjc4OS9oZWxsby13b3JsZC1naHJjOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgNTAwMDo4MDgwIGdoY3IuaW8vdWJhaGFzYmVlbjc4OS9oZWxsby13b3JsZC1naHJjOmxhdGVzdA=="}' --region us-east-1
-
-      - name: Update launch template
-        run: |
-          aws ec2 create-launch-template-version \
-            --launch-template-name TemplateForAutoScaling \
-            --version-description AutoScalingVersion1 \
-            --source-version 1 \
-            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vdWJhaGFzYmVlbjc4OS9oZWxsby13b3JsZC1naHJjOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgNTAwMDo4MDgwIGdoY3IuaW8vdWJhaGFzYmVlbjc4OS9oZWxsby13b3JsZC1naHJjOmxhdGVzdA=="}' --region us-east-1
+            --launch-template-name python-microservice-lt \
+            --version-description python-microservice-for-Auto-Scaling-Version-1 \
+            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgNTAwMDo4MDgwIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdA=="}' --region us-east-1
 
       - name: Get Latest Launch Template Version
         id: get-lt-version
         if: env.existslt == 'true'
         run: |
-          LAUNCH_TEMPLATE_NAME="TemplateForAutoScaling"
+          LAUNCH_TEMPLATE_NAME="python-microservice-lt"
           echo "LAUNCH_TEMPLATE_NAME=$LAUNCH_TEMPLATE_NAME" >> $GITHUB_ENV
           LATEST_VERSION=$(aws ec2 describe-launch-templates --launch-template-names $LAUNCH_TEMPLATE_NAME --query 'LaunchTemplates[0].LatestVersionNumber' --output text)
           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
         shell: bash
+
+      - name: Increment Latest Version
+        if: env.existslt == 'true'
+        run: |
+          NEW_VERSION=$((LATEST_VERSION + 1))
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Update launch template
+        if: env.existslt == 'true'
+        run: |
+          aws ec2 create-launch-template-version \
+            --launch-template-name python-microservice-lt \
+            --version-description python-microservice-for-Auto-Scaling-Version-${{ env.NEW_VERSION }} \
+            --source-version 1 \
+            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgNTAwMDo4MDgwIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdA=="}' --region us-east-1
