@@ -93,7 +93,7 @@ jobs:
           aws ec2 create-launch-template \
             --launch-template-name python-microservice-lt \
             --version-description python-microservice-for-Auto-Scaling-Version-1 \
-            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgNTAwMDo4MDgwIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdA=="}' --region us-east-1
+            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgODA6ODA4MCBnaGNyLmlvL3ByYXhpc2FwcGRldi9nZXQtY2xpZW50LWlwLXB5dGhvbjpsYXRlc3Q="}' --region us-east-1
 
       - name: Get Latest Launch Template Version
         id: get-lt-version
@@ -119,7 +119,7 @@ jobs:
             --launch-template-name python-microservice-lt \
             --version-description python-microservice-for-Auto-Scaling-Version-${{ env.NEW_VERSION }} \
             --source-version 1 \
-            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgNTAwMDo4MDgwIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdA=="}' --region us-east-1
+            --launch-template-data '{"NetworkInterfaces":[{"DeviceIndex":0,"AssociatePublicIpAddress":true,"Groups":["sg-0abe937fd14a5c9f8"],"DeleteOnTermination":true}],"ImageId":"ami-0bb84b8ffd87024d8","InstanceType":"t2.nano","KeyName":"proj_2-main-key","UserData":"IyEvYmluL2Jhc2gKc3VkbyB5dW0gdXBkYXRlIC15CnN1ZG8geXVtIGluc3RhbGwgLXkgZG9ja2VyCnN1ZG8gc2VydmljZSBkb2NrZXIgc3RhcnQKc3VkbyB1c2VybW9kIC1hIC1HIGRvY2tlciBlYzItdXNlcgpzdWRvIGRvY2tlciBwdWxsIGdoY3IuaW8vcHJheGlzYXBwZGV2L2dldC1jbGllbnQtaXAtcHl0aG9uOmxhdGVzdApzdWRvIGRvY2tlciBydW4gLWQgLXAgODA6ODA4MCBnaGNyLmlvL3ByYXhpc2FwcGRldi9nZXQtY2xpZW50LWlwLXB5dGhvbjpsYXRlc3Q="}' --region us-east-1
 
       - name: Check if Auto Scaling group exists
         id: check-asg
@@ -140,7 +140,7 @@ jobs:
           aws autoscaling create-auto-scaling-group \
             --auto-scaling-group-name python-microservice-asg \
             --launch-template LaunchTemplateName=python-microservice-lt \
-            --target-group-arns arn:aws:elasticloadbalancing:us-east-1:489172774606:targetgroup/fastapi-tg/9f16bc95eeca0705 \
+            --target-group-arns arn:aws:elasticloadbalancing:us-east-1:489172774606:targetgroup/AFTERHOURS-API-GATEWAY/0b261e6bbaaba820 \
             --health-check-type ELB \
             --health-check-grace-period 300 \
             --availability-zones us-east-1a us-east-1b us-east-1c \
